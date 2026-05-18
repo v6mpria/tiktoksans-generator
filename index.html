@@ -12,10 +12,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
     <style>
-        /* Import Porky's font from CDN */
         @import url('https://fonts.cdnfonts.com/css/porkys');
 
-        /* Base Reset & Custom Soft Pink Scrollbar */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -34,7 +32,6 @@
             border-radius: 4px;
         }
 
-        /* Dreamy Twinkling Pink Background with Pixel Stars */
         body {
             background-color: #ffdae0;
             background-image: 
@@ -61,7 +58,6 @@
             100% { background-position: 0 0, 40px 60px, 130px 270px; }
         }
 
-        /* Twinkling Pixel Stars */
         .pixel-star {
             position: absolute;
             width: 8px;
@@ -86,7 +82,6 @@
             50% { opacity: 1; transform: scale(1.15); }
         }
 
-        /* Glassmorphic Main App Container */
         .creator-container {
             background: rgba(255, 255, 255, 0.85);
             backdrop-filter: blur(12px);
@@ -101,7 +96,6 @@
             z-index: 2;
         }
 
-        /* Bubbly Porky's Styled Title */
         h1 {
             font-family: 'Porkys', 'TikTok Sans', sans-serif;
             font-size: 38px;
@@ -113,7 +107,6 @@
             line-height: 1.1;
         }
 
-        /* Layout Controls styling */
         .controls {
             display: flex;
             flex-direction: column;
@@ -121,7 +114,6 @@
             margin-bottom: 24px;
         }
 
-        /* Custom Drag & Drop File Upload Panel */
         .file-upload-wrapper {
             position: relative;
             background: #fff5f6;
@@ -145,6 +137,12 @@
             color: #73545b;
         }
 
+        .file-upload-wrapper.drag-over {
+            background: #ffe0e6;
+            border-color: #fe2c55;
+            border-style: solid;
+        }
+
         #imageInput {
             position: absolute;
             left: 0;
@@ -155,7 +153,6 @@
             cursor: pointer;
         }
 
-        /* Soft Text Area Input */
         textarea {
             width: 100%;
             padding: 14px;
@@ -177,7 +174,6 @@
             border-color: #ff91a4;
         }
 
-        /* Sliders / Control Rows */
         .picker-row {
             display: flex;
             flex-direction: column;
@@ -197,10 +193,17 @@
             font-weight: 600;
         }
 
-        /* Preset color square buttons */
+        .control-item label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+        }
+
         .bg-presets {
             display: flex;
             gap: 8px;
+            flex-wrap: wrap;
         }
 
         .preset-btn {
@@ -210,10 +213,19 @@
             border: 2px solid white;
             cursor: pointer;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: transform 0.15s;
         }
 
-        /* Custom color picker circle */
-        #colorInput {
+        .preset-btn:hover {
+            transform: scale(1.15);
+        }
+
+        .preset-btn.active {
+            border-color: #fe2c55;
+            box-shadow: 0 0 0 2px #fe2c55;
+        }
+
+        #colorInput, #strokeColorInput {
             -webkit-appearance: none;
             -moz-appearance: none;
             appearance: none;
@@ -224,15 +236,16 @@
             cursor: pointer;
         }
 
-        #colorInput::-webkit-color-swatch {
+        #colorInput::-webkit-color-swatch,
+        #strokeColorInput::-webkit-color-swatch {
             border-radius: 50%;
             border: 2px solid #ffffff;
             box-shadow: 0 2px 8px rgba(0,0,0,0.15);
         }
 
-        /* Pink Custom Sliders styling */
         input[type=range] {
             -webkit-appearance: none;
+            appearance: none;
             width: 150px;
             background: transparent;
         }
@@ -265,8 +278,32 @@
             transform: scale(1.2);
         }
 
-        /* Download Button */
+        input[type=range]::-moz-range-track {
+            width: 100%;
+            height: 8px;
+            cursor: pointer;
+            background: #ffd0d8;
+            border-radius: 4px;
+            border: none;
+        }
+
+        input[type=range]::-moz-range-thumb {
+            height: 18px;
+            width: 18px;
+            border-radius: 50%;
+            background: #fe2c55;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 5px rgba(254, 44, 85, 0.3);
+        }
+
+        .btn-row {
+            display: flex;
+            gap: 10px;
+        }
+
         .download-btn {
+            flex: 1;
             background-color: #fe2c55;
             color: white;
             border: none;
@@ -277,20 +314,94 @@
             cursor: pointer;
             box-shadow: 0 6px 20px rgba(254, 44, 85, 0.3);
             transition: all 0.2s ease;
+            font-family: 'TikTok Sans', sans-serif;
         }
 
-        .download-btn:hover {
+        .download-btn:hover:not(:disabled) {
             background-color: #e02247;
             transform: translateY(-2px);
             box-shadow: 0 8px 24px rgba(254, 44, 85, 0.4);
         }
 
-        /* Image Display Preview Canvas (Square) */
+        .download-btn:disabled {
+            opacity: 0.7;
+            cursor: wait;
+        }
+
+        .reset-btn {
+            background-color: white;
+            color: #fe2c55;
+            border: 2px solid #ffccd5;
+            padding: 14px 18px;
+            border-radius: 14px;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: 'TikTok Sans', sans-serif;
+        }
+
+        .reset-btn:hover {
+            background: #fff0f2;
+            border-color: #fe2c55;
+        }
+
+        .toggle-btn {
+            padding: 5px 12px;
+            border-radius: 8px;
+            border: 2px solid #ffccd5;
+            background: white;
+            color: #73545b;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.15s;
+            font-family: 'TikTok Sans', sans-serif;
+        }
+
+        .toggle-btn:hover {
+            border-color: #ff91a4;
+        }
+
+        .toggle-btn.active {
+            background: #fe2c55;
+            color: white;
+            border-color: #fe2c55;
+        }
+
+        .aspect-row {
+            display: flex;
+            gap: 6px;
+        }
+
+        .aspect-btn {
+            padding: 4px 10px;
+            border-radius: 8px;
+            border: 2px solid #ffccd5;
+            background: white;
+            color: #73545b;
+            font-weight: 600;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.15s;
+            font-family: 'TikTok Sans', sans-serif;
+        }
+
+        .aspect-btn:hover {
+            border-color: #ff91a4;
+        }
+
+        .aspect-btn.active {
+            background: #fe2c55;
+            color: white;
+            border-color: #fe2c55;
+        }
+
         .canvas-preview {
             position: relative;
             width: 100%;
             aspect-ratio: 1 / 1;
-            background-color: #111111; /* Default to dark aesthetic look */
+            background-color: #111111;
             border-radius: 16px;
             overflow: hidden;
             display: flex;
@@ -298,6 +409,14 @@
             align-items: center;
             box-shadow: 0 8px 24px rgba(234, 150, 166, 0.2);
             border: 3px solid #ffffff;
+        }
+
+        .canvas-preview.aspect-916 {
+            aspect-ratio: 9 / 16;
+        }
+
+        .canvas-preview.aspect-169 {
+            aspect-ratio: 16 / 9;
         }
 
         #userImage {
@@ -311,22 +430,32 @@
             z-index: 1;
         }
 
-        /* TikTok-Aesthetic Text Overlay (Completely Flat, Drag-Friendly) */
         .overlay-text {
             position: absolute;
             width: 85%;
             text-align: center;
             font-family: 'TikTok Sans', sans-serif;
-            font-weight: 600; /* TikTok Medium/Semi-Bold */
+            font-weight: 600;
             font-size: 32px;
             line-height: 1.25;
             color: #ffd1dc;
             word-wrap: break-word;
-            text-transform: lowercase; /* Forces beautiful clean lowercase */
             cursor: grab;
             touch-action: none;
             padding: 10px;
             z-index: 2;
+        }
+
+        .overlay-text.case-lower {
+            text-transform: lowercase;
+        }
+
+        .overlay-text.case-upper {
+            text-transform: uppercase;
+        }
+
+        .overlay-text.case-normal {
+            text-transform: none;
         }
 
         .overlay-text:active {
@@ -338,6 +467,90 @@
             height: 18px;
             fill: currentColor;
         }
+
+        .section-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: #b08a92;
+            font-weight: 700;
+            text-align: left;
+            margin-top: 4px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: color 0.15s;
+        }
+
+        .section-label:hover {
+            color: #fe2c55;
+        }
+
+        .section-label:hover .chevron {
+            fill: #fe2c55;
+        }
+
+        .chevron {
+            width: 12px;
+            height: 12px;
+            fill: #b08a92;
+            transition: transform 0.25s ease, fill 0.15s;
+            flex-shrink: 0;
+        }
+
+        .section-label.open .chevron {
+            transform: rotate(180deg);
+        }
+
+        .collapsible-section {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .section-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.35s ease;
+        }
+
+        .section-content.open {
+            max-height: 600px;
+            margin-top: 8px;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(80px);
+            background: #fe2c55;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 14px;
+            box-shadow: 0 8px 24px rgba(254, 44, 85, 0.4);
+            z-index: 9999;
+            opacity: 0;
+            transition: all 0.3s ease;
+            pointer-events: none;
+            font-family: 'TikTok Sans', sans-serif;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        @media (max-width: 420px) {
+            .control-item { flex-direction: column; align-items: flex-start; gap: 6px; }
+            input[type=range] { width: 100%; }
+            .creator-container { padding: 18px; }
+            h1 { font-size: 28px; }
+            .btn-row { flex-direction: column; }
+            .bg-presets { gap: 6px; }
+        }
     </style>
 </head>
 <body>
@@ -347,163 +560,578 @@
     <div class="pixel-star star-3"></div>
     <div class="pixel-star star-4"></div>
 
+    <div id="toast" class="toast"></div>
+
     <div class="creator-container">
         <h1>TikTok Sans Maker</h1>
         
         <div class="controls">
-            <div class="file-upload-wrapper">
+            <div class="file-upload-wrapper" id="dropZone">
                 <svg class="upload-icon" viewBox="0 0 24 24">
                     <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/>
                 </svg>
-                <span>Upload background image</span>
+                <span id="uploadLabel">Upload background image</span>
                 <input type="file" id="imageInput" accept="image/*">
             </div>
 
             <textarea id="textInput" placeholder="type your whisper here..."></textarea>
             
-            <div class="picker-row">
-                <div class="control-item">
-                    <span>Text Color</span>
-                    <input type="color" id="colorInput" value="#ffd1dc">
-                </div>
-                <div class="control-item">
-                    <span>Font Size</span>
-                    <input type="range" id="sizeInput" min="16" max="100" value="32">
-                </div>
-                <div class="control-item">
-                    <span>Vertical Position</span>
-                    <input type="range" id="yPosInput" min="0" max="100" value="50">
-                </div>
-                <div class="control-item">
-                    <span>Backup Background</span>
-                    <div class="bg-presets">
-                        <div class="preset-btn" style="background: #111111;" onclick="changeBgColor('#111111')"></div>
-                        <div class="preset-btn" style="background: #222222;" onclick="changeBgColor('#222222')"></div>
-                        <div class="preset-btn" style="background: #000000;" onclick="changeBgColor('#000000')"></div>
+            <div class="collapsible-section">
+                <div class="section-label" onclick="toggleSection(this)"><span>Typography</span><svg class="chevron" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg></div>
+                <div class="section-content">
+                <div class="picker-row">
+                    <div class="control-item">
+                        <span>Text Color</span>
+                        <input type="color" id="colorInput" value="#ffd1dc">
+                    </div>
+                    <div class="control-item">
+                        <span>Font Size</span>
+                        <input type="range" id="sizeInput" min="16" max="100" value="32">
+                    </div>
+                    <div class="control-item">
+                        <span>Font Weight</span>
+                        <input type="range" id="weightInput" min="400" max="700" value="600" step="50">
+                    </div>
+                    <div class="control-item">
+                        <span>Letter Spacing</span>
+                        <input type="range" id="spacingInput" min="-2" max="20" value="0">
+                    </div>
+                    <div class="control-item">
+                        <span>Opacity</span>
+                        <input type="range" id="opacityInput" min="10" max="100" value="100">
+                    </div>
+                    <div class="control-item">
+                        <span>Case</span>
+                        <div style="display:flex; gap:4px;">
+                            <button class="toggle-btn active" data-case="lower" onclick="setCase('lower')">aa</button>
+                            <button class="toggle-btn" data-case="upper" onclick="setCase('upper')">AA</button>
+                            <button class="toggle-btn" data-case="normal" onclick="setCase('normal')">Aa</button>
+                        </div>
                     </div>
                 </div>
+                </div>
             </div>
-            
-            <button id="downloadBtn" class="download-btn">Download Image</button>
+
+            <div class="collapsible-section">
+                <div class="section-label" onclick="toggleSection(this)"><span>Text Stroke</span><svg class="chevron" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg></div>
+                <div class="section-content">
+                <div class="picker-row">
+                    <div class="control-item">
+                        <label>
+                            <input type="checkbox" id="strokeToggle" checked> Enable Stroke
+                        </label>
+                    </div>
+                    <div class="control-item">
+                        <span>Stroke Color</span>
+                        <input type="color" id="strokeColorInput" value="#000000">
+                    </div>
+                    <div class="control-item">
+                        <span>Stroke Width</span>
+                        <input type="range" id="strokeWidthInput" min="0" max="6" value="2" step="0.5">
+                    </div>
+                    <div class="control-item">
+                        <label>
+                            <input type="checkbox" id="textBgToggle"> Text Background Bar
+                        </label>
+                    </div>
+                </div>
+                </div>
+            </div>
+
+            <div class="collapsible-section">
+                <div class="section-label" onclick="toggleSection(this)"><span>Position</span><svg class="chevron" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg></div>
+                <div class="section-content">
+                <div class="picker-row">
+                    <div class="control-item">
+                        <span>Vertical</span>
+                        <input type="range" id="yPosInput" min="5" max="95" value="50">
+                    </div>
+                    <div class="control-item">
+                        <span>Horizontal</span>
+                        <input type="range" id="xPosInput" min="5" max="95" value="50">
+                    </div>
+                </div>
+                </div>
+            </div>
+
+            <div class="collapsible-section">
+                <div class="section-label" onclick="toggleSection(this)"><span>Background</span><svg class="chevron" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg></div>
+                <div class="section-content">
+                <div class="picker-row">
+                    <div class="control-item">
+                        <span>Preset</span>
+                        <div class="bg-presets">
+                            <div class="preset-btn active" style="background: #111111;" onclick="changeBgColor('#111111', this)"></div>
+                            <div class="preset-btn" style="background: #1a1a2e;" onclick="changeBgColor('#1a1a2e', this)"></div>
+                            <div class="preset-btn" style="background: #000000;" onclick="changeBgColor('#000000', this)"></div>
+                            <div class="preset-btn" style="background: #fefefe;" onclick="changeBgColor('#fefefe', this)"></div>
+                            <div class="preset-btn" style="background: linear-gradient(135deg, #667eea, #764ba2);" onclick="changeBgGradient('linear-gradient(135deg,#667eea,#764ba2)', this)"></div>
+                            <div class="preset-btn" style="background: linear-gradient(135deg, #f093fb, #f5576c);" onclick="changeBgGradient('linear-gradient(135deg,#f093fb,#f5576c)', this)"></div>
+                            <div class="preset-btn" style="background: linear-gradient(135deg, #4facfe, #00f2fe);" onclick="changeBgGradient('linear-gradient(135deg,#4facfe,#00f2fe)', this)"></div>
+                            <div class="preset-btn" style="background: linear-gradient(135deg, #43e97b, #38f9d7);" onclick="changeBgGradient('linear-gradient(135deg,#43e97b,#38f9d7)', this)"></div>
+                        </div>
+                    </div>
+                    <div class="control-item">
+                        <span>Image Brightness</span>
+                        <input type="range" id="brightnessInput" min="20" max="200" value="100">
+                    </div>
+                    <div class="control-item">
+                        <span>Image Contrast</span>
+                        <input type="range" id="contrastInput" min="20" max="200" value="100">
+                    </div>
+                    <div class="control-item">
+                        <span>Image Saturation</span>
+                        <input type="range" id="saturationInput" min="0" max="200" value="100">
+                    </div>
+                </div>
+                </div>
+            </div>
+
+            <div class="collapsible-section">
+                <div class="section-label" onclick="toggleSection(this)"><span>Canvas Size</span><svg class="chevron" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg></div>
+                <div class="section-content">
+                <div class="picker-row">
+                    <div class="control-item">
+                        <span>Aspect Ratio</span>
+                        <div class="aspect-row">
+                            <button class="aspect-btn active" data-ratio="1/1" onclick="setAspect('1/1', this)">1:1</button>
+                            <button class="aspect-btn" data-ratio="9/16" onclick="setAspect('9/16', this)">9:16</button>
+                            <button class="aspect-btn" data-ratio="16/9" onclick="setAspect('16/9', this)">16:9</button>
+                        </div>
+                    </div>
+                </div>
+                </div>
+            </div>
+
+            <div class="btn-row">
+                <button id="downloadBtn" class="download-btn">Download Image</button>
+                <button id="resetBtn" class="reset-btn" onclick="resetAll()">Reset</button>
+            </div>
         </div>
 
         <div id="canvasPreview" class="canvas-preview">
             <img id="userImage" src="" alt="">
-            <div id="overlayText" class="overlay-text">your text here.</div>
+            <div id="overlayText" class="overlay-text case-lower">your text here.</div>
         </div>
     </div>
 
     <script>
+        // ─── Collapsible Sections ───
+        function toggleSection(header) {
+            var content = header.nextElementSibling;
+            var isOpen = header.classList.contains('open');
+            header.classList.toggle('open', !isOpen);
+            content.classList.toggle('open', !isOpen);
+        }
+
+        // ─── DOM References ───
         const imageInput = document.getElementById('imageInput');
         const textInput = document.getElementById('textInput');
         const colorInput = document.getElementById('colorInput');
         const sizeInput = document.getElementById('sizeInput');
+        const weightInput = document.getElementById('weightInput');
+        const spacingInput = document.getElementById('spacingInput');
+        const opacityInput = document.getElementById('opacityInput');
         const yPosInput = document.getElementById('yPosInput');
+        const xPosInput = document.getElementById('xPosInput');
         const userImage = document.getElementById('userImage');
         const overlayText = document.getElementById('overlayText');
         const downloadBtn = document.getElementById('downloadBtn');
         const canvasPreview = document.getElementById('canvasPreview');
+        const strokeToggle = document.getElementById('strokeToggle');
+        const strokeColorInput = document.getElementById('strokeColorInput');
+        const strokeWidthInput = document.getElementById('strokeWidthInput');
+        const textBgToggle = document.getElementById('textBgToggle');
+        const brightnessInput = document.getElementById('brightnessInput');
+        const contrastInput = document.getElementById('contrastInput');
+        const saturationInput = document.getElementById('saturationInput');
+        const dropZone = document.getElementById('dropZone');
+        const uploadLabel = document.getElementById('uploadLabel');
+        const toastEl = document.getElementById('toast');
 
-        // Drag state variables
+        // ─── State ───
         let isDragging = false;
+        let startX = 0;
         let startY = 0;
+        let startPercentX = 50;
         let startPercentY = 50;
+        let currentCase = 'lower';
+        let imageLoaded = false;
 
-        // 1. Handle image upload safely
-        imageInput.addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(event) {
-                    userImage.src = event.target.result;
-                    userImage.style.display = 'block';
-                    updateText();
-                };
-                reader.readAsDataURL(file);
+        // ─── Undo History ───
+        const history = [];
+        const MAX_HISTORY = 20;
+
+        function saveState() {
+            const state = {
+                text: textInput.value,
+                color: colorInput.value,
+                size: sizeInput.value,
+                weight: weightInput.value,
+                spacing: spacingInput.value,
+                opacity: opacityInput.value,
+                yPos: yPosInput.value,
+                xPos: xPosInput.value,
+                strokeEnabled: strokeToggle.checked,
+                strokeColor: strokeColorInput.value,
+                strokeWidth: strokeWidthInput.value,
+                textBg: textBgToggle.checked,
+                brightness: brightnessInput.value,
+                contrast: contrastInput.value,
+                saturation: saturationInput.value,
+                caseMode: currentCase
+            };
+            history.push(JSON.stringify(state));
+            if (history.length > MAX_HISTORY) history.shift();
+        }
+
+        function undo() {
+            if (history.length < 2) return;
+            history.pop();
+            const prev = JSON.parse(history[history.length - 1]);
+            textInput.value = prev.text;
+            colorInput.value = prev.color;
+            sizeInput.value = prev.size;
+            weightInput.value = prev.weight;
+            spacingInput.value = prev.spacing;
+            opacityInput.value = prev.opacity;
+            yPosInput.value = prev.yPos;
+            xPosInput.value = prev.xPos;
+            strokeToggle.checked = prev.strokeEnabled;
+            strokeColorInput.value = prev.strokeColor;
+            strokeWidthInput.value = prev.strokeWidth;
+            textBgToggle.checked = prev.textBg;
+            brightnessInput.value = prev.brightness;
+            contrastInput.value = prev.contrast;
+            saturationInput.value = prev.saturation;
+            setCase(prev.caseMode);
+            updateText();
+            showToast('Undo!');
+        }
+
+        // ─── Toast ───
+        let toastTimeout;
+        function showToast(msg) {
+            toastEl.textContent = msg;
+            toastEl.classList.add('show');
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(function() { toastEl.classList.remove('show'); }, 2000);
+        }
+
+        // ─── Image Upload ───
+        function loadImageFile(file) {
+            if (!file || !file.type.startsWith('image/')) {
+                showToast('Please select a valid image file');
+                return;
             }
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                userImage.src = event.target.result;
+                userImage.style.display = 'block';
+                imageLoaded = true;
+                var name = file.name;
+                uploadLabel.textContent = name.length > 25 ? name.slice(0, 22) + '...' : name;
+                updateText();
+                showToast('Image loaded!');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        imageInput.addEventListener('change', function(e) {
+            if (e.target.files[0]) loadImageFile(e.target.files[0]);
         });
 
-        // Backup color picker helper
-        function changeBgColor(color) {
-            userImage.style.display = 'none'; // Hide image if they pick a solid background color
+        // Drag and drop
+        dropZone.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            dropZone.classList.add('drag-over');
+        });
+
+        dropZone.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            dropZone.classList.remove('drag-over');
+        });
+
+        dropZone.addEventListener('drop', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            dropZone.classList.remove('drag-over');
+            var file = e.dataTransfer.files[0];
+            loadImageFile(file);
+        });
+
+        // ─── Background Presets ───
+        function changeBgColor(color, el) {
+            userImage.style.display = 'none';
+            imageLoaded = false;
+            canvasPreview.style.backgroundImage = 'none';
             canvasPreview.style.backgroundColor = color;
+            uploadLabel.textContent = 'Upload background image';
+            document.querySelectorAll('.preset-btn').forEach(function(b) { b.classList.remove('active'); });
+            if (el) el.classList.add('active');
+            saveState();
         }
 
-        // 2. Main function to update text rendering dynamically
+        function changeBgGradient(gradient, el) {
+            userImage.style.display = 'none';
+            imageLoaded = false;
+            canvasPreview.style.backgroundColor = 'transparent';
+            canvasPreview.style.backgroundImage = gradient;
+            uploadLabel.textContent = 'Upload background image';
+            document.querySelectorAll('.preset-btn').forEach(function(b) { b.classList.remove('active'); });
+            if (el) el.classList.add('active');
+            saveState();
+        }
+
+        // ─── Case Toggle ───
+        function setCase(mode) {
+            currentCase = mode;
+            overlayText.classList.remove('case-lower', 'case-upper', 'case-normal');
+            overlayText.classList.add('case-' + mode);
+            document.querySelectorAll('.toggle-btn[data-case]').forEach(function(btn) {
+                btn.classList.toggle('active', btn.dataset.case === mode);
+            });
+            updateText();
+        }
+
+        // ─── Aspect Ratio ───
+        function setAspect(ratio, el) {
+            canvasPreview.classList.remove('aspect-916', 'aspect-169');
+            if (ratio === '9/16') canvasPreview.classList.add('aspect-916');
+            if (ratio === '16/9') canvasPreview.classList.add('aspect-169');
+            document.querySelectorAll('.aspect-btn').forEach(function(b) { b.classList.remove('active'); });
+            if (el) el.classList.add('active');
+        }
+
+        // ─── Main Text Update ───
         function updateText() {
-            overlayText.textContent = textInput.value || "your text here.";
+            var text = textInput.value || 'your text here.';
+            overlayText.textContent = text;
             overlayText.style.color = colorInput.value;
             overlayText.style.fontSize = sizeInput.value + 'px';
-            
+            overlayText.style.fontWeight = weightInput.value;
+            overlayText.style.letterSpacing = spacingInput.value + 'px';
+            overlayText.style.opacity = opacityInput.value / 100;
+
             overlayText.style.top = yPosInput.value + '%';
-            overlayText.style.transform = 'translateY(-50%)';
+            overlayText.style.left = xPosInput.value + '%';
+            overlayText.style.transform = 'translate(-50%, -50%)';
+
+            // Stroke via text-shadow for html2canvas compatibility
+            if (strokeToggle.checked) {
+                var sw = parseFloat(strokeWidthInput.value) || 0;
+                var sc = strokeColorInput.value;
+                overlayText.style.webkitTextStroke = sw + 'px ' + sc;
+                var spread = Math.max(0, sw * 0.6);
+                var shadows = [];
+                for (var angle = 0; angle < 360; angle += 45) {
+                    var r = angle * Math.PI / 180;
+                    shadows.push(
+                        Math.round(Math.cos(r) * spread) + 'px ' +
+                        Math.round(Math.sin(r) * spread) + 'px 0 ' + sc
+                    );
+                }
+                overlayText.style.textShadow = shadows.join(', ');
+            } else {
+                overlayText.style.webkitTextStroke = '0';
+                overlayText.style.textShadow = 'none';
+            }
+
+            // Text background bar
+            if (textBgToggle.checked) {
+                overlayText.style.backgroundColor = 'rgba(0,0,0,0.5)';
+                overlayText.style.borderRadius = '8px';
+                overlayText.style.padding = '12px 16px';
+            } else {
+                overlayText.style.backgroundColor = 'transparent';
+                overlayText.style.padding = '10px';
+            }
+
+            // Image filters
+            userImage.style.filter = 
+                'brightness(' + brightnessInput.value + '%) ' +
+                'contrast(' + contrastInput.value + '%) ' +
+                'saturate(' + saturationInput.value + '%)';
         }
 
-        // Attach listeners for parameter changes
-        textInput.addEventListener('input', updateText);
-        colorInput.addEventListener('input', updateText);
-        sizeInput.addEventListener('input', updateText);
-        yPosInput.addEventListener('input', updateText);
+        // ─── Attach Listeners ───
+        var controlInputs = [
+            textInput, colorInput, sizeInput, weightInput, spacingInput,
+            opacityInput, yPosInput, xPosInput, strokeToggle, strokeColorInput,
+            strokeWidthInput, textBgToggle, brightnessInput, contrastInput, saturationInput
+        ];
 
-        // Run setup routine on load
-        updateText();
+        controlInputs.forEach(function(el) {
+            el.addEventListener('input', function() { updateText(); });
+            el.addEventListener('change', function() { saveState(); });
+        });
 
-        // 3. Direct Drag and Drop / Touch Support
+        // ─── Drag to Reposition ───
         overlayText.addEventListener('mousedown', dragStart);
         overlayText.addEventListener('touchstart', dragStart, { passive: true });
-
         window.addEventListener('mousemove', dragMove);
         window.addEventListener('touchmove', dragMove, { passive: false });
-
         window.addEventListener('mouseup', dragEnd);
         window.addEventListener('touchend', dragEnd);
 
         function dragStart(e) {
             isDragging = true;
-            startY = e.clientY || (e.touches && e.touches[0].clientY);
+            var clientX = e.clientX || (e.touches && e.touches[0].clientX);
+            var clientY = e.clientY || (e.touches && e.touches[0].clientY);
+            startX = clientX;
+            startY = clientY;
+            startPercentX = parseFloat(xPosInput.value);
             startPercentY = parseFloat(yPosInput.value);
         }
 
         function dragMove(e) {
             if (!isDragging) return;
             if (e.cancelable) e.preventDefault();
-
-            const currentY = e.clientY || (e.touches && e.touches[0].clientY);
-            const deltaY = currentY - startY;
-            const containerHeight = canvasPreview.clientHeight;
-
-            const percentDeltaY = (deltaY / containerHeight) * 100;
-            let newPercentY = startPercentY + percentDeltaY;
-
-            newPercentY = Math.max(5, Math.min(95, newPercentY));
-            
-            yPosInput.value = newPercentY;
+            var clientX = e.clientX || (e.touches && e.touches[0].clientX);
+            var clientY = e.clientY || (e.touches && e.touches[0].clientY);
+            var rect = canvasPreview.getBoundingClientRect();
+            var deltaX = clientX - startX;
+            var deltaY = clientY - startY;
+            var percentDeltaX = (deltaX / rect.width) * 100;
+            var percentDeltaY = (deltaY / rect.height) * 100;
+            var newX = Math.max(5, Math.min(95, startPercentX + percentDeltaX));
+            var newY = Math.max(5, Math.min(95, startPercentY + percentDeltaY));
+            xPosInput.value = Math.round(newX);
+            yPosInput.value = Math.round(newY);
             updateText();
         }
 
         function dragEnd() {
-            isDragging = false;
+            if (isDragging) {
+                isDragging = false;
+                saveState();
+            }
         }
 
-        // 4. Download processed output (High-Quality PNG)
+        // ─── Keyboard Shortcuts ───
+        document.addEventListener('keydown', function(e) {
+            if (e.target === textInput) return;
+            if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
+                e.preventDefault();
+                undo();
+            }
+            if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                e.preventDefault();
+                downloadBtn.click();
+            }
+            if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                yPosInput.value = Math.max(5, parseInt(yPosInput.value) - 1);
+                updateText();
+            }
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                yPosInput.value = Math.min(95, parseInt(yPosInput.value) + 1);
+                updateText();
+            }
+            if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                xPosInput.value = Math.max(5, parseInt(xPosInput.value) - 1);
+                updateText();
+            }
+            if (e.key === 'ArrowRight') {
+                e.preventDefault();
+                xPosInput.value = Math.min(95, parseInt(xPosInput.value) + 1);
+                updateText();
+            }
+        });
+
+        // ─── Reset ───
+        function resetAll() {
+            textInput.value = '';
+            colorInput.value = '#ffd1dc';
+            sizeInput.value = 32;
+            weightInput.value = 600;
+            spacingInput.value = 0;
+            opacityInput.value = 100;
+            yPosInput.value = 50;
+            xPosInput.value = 50;
+            strokeToggle.checked = true;
+            strokeColorInput.value = '#000000';
+            strokeWidthInput.value = 2;
+            textBgToggle.checked = false;
+            brightnessInput.value = 100;
+            contrastInput.value = 100;
+            saturationInput.value = 100;
+            userImage.style.display = 'none';
+            userImage.src = '';
+            imageLoaded = false;
+            canvasPreview.style.backgroundImage = 'none';
+            canvasPreview.style.backgroundColor = '#111111';
+            uploadLabel.textContent = 'Upload background image';
+            setCase('lower');
+            setAspect('1/1', document.querySelector('.aspect-btn[data-ratio="1/1"]'));
+            document.querySelectorAll('.preset-btn').forEach(function(b) { b.classList.remove('active'); });
+            document.querySelector('.preset-btn').classList.add('active');
+            history.length = 0;
+            updateText();
+            saveState();
+            showToast('All reset!');
+        }
+
+        // ─── Download ───
         downloadBtn.addEventListener('click', function() {
-            // Give a tiny timeout to ensure everything is perfectly painted before taking a canvas capture
-            setTimeout(() => {
+            downloadBtn.textContent = 'Generating...';
+            downloadBtn.disabled = true;
+
+            var exportW = 1080;
+            var exportH = 1080;
+            if (canvasPreview.classList.contains('aspect-916')) {
+                exportW = 1080;
+                exportH = 1920;
+            } else if (canvasPreview.classList.contains('aspect-169')) {
+                exportW = 1920;
+                exportH = 1080;
+            }
+
+            var currentW = canvasPreview.offsetWidth;
+            var scale = exportW / currentW;
+
+            setTimeout(function() {
                 html2canvas(canvasPreview, {
                     useCORS: true,
                     allowTaint: true,
                     logging: false,
-                    scale: 3 
-                }).then(canvas => {
-                    const link = document.createElement('a');
+                    scale: scale,
+                    width: currentW,
+                    height: canvasPreview.offsetHeight,
+                    onclone: function(clonedDoc) {
+                        var clonedText = clonedDoc.getElementById('overlayText');
+                        if (clonedText) {
+                            clonedText.style.fontFamily = "'TikTok Sans', sans-serif";
+                        }
+                    }
+                }).then(function(canvas) {
+                    var finalCanvas = document.createElement('canvas');
+                    finalCanvas.width = exportW;
+                    finalCanvas.height = exportH;
+                    var ctx = finalCanvas.getContext('2d');
+                    ctx.drawImage(canvas, 0, 0, exportW, exportH);
+                    var link = document.createElement('a');
                     link.download = 'tiktok-sans-image.png';
-                    link.href = canvas.toDataURL('image/png');
+                    link.href = finalCanvas.toDataURL('image/png');
                     link.click();
-                }).catch(err => {
-                    alert("Export error: Try typing text over one of the built-in solid color background options instead!");
+                    showToast('Image saved!');
+                }).catch(function(err) {
+                    console.error('Export error:', err);
+                    showToast('Export failed — try a solid color background');
+                }).finally(function() {
+                    downloadBtn.textContent = 'Download Image';
+                    downloadBtn.disabled = false;
                 });
-            }, 50);
+            }, 100);
         });
+
+        // ─── Initialize ───
+        updateText();
+        saveState();
     </script>
 </body>
 </html>
